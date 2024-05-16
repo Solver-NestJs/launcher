@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  #======================================================================
+  # NATS Server
+  #======================================================================
+  nats-server:
+    image: nats:latest
+    ports:
+      - 8222:8222
+  #======================================================================
+  # CLIENT GATEWAY
+  #======================================================================
+  client-gateway:
+    build: ./client-gateway
+    ports:
+      - ${CLIENT_GATEWAY_PORT}:3000
+    volumes:
+      - ./client-gateway/src:/usr/src/app/src
+    command: yarn start:dev
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - NATS_SERVERS=nats://nats-server:4222
+  #======================================================================
+  # PRODUCTS MICROSERVICE
+  #======================================================================
+  products-ms:
+    build: ./products
+    ports:
+      - 3001:3001
+    volumes:
+      - ./products/src:/usr/src/app/src
+    command: yarn start:dev
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=file:./productDb.db
+  #======================================================================
+  # ORDERS MICROSERVICE
+  #======================================================================
+  orders-ms:
+    depends_on:
+      - orders-db
+    build: ./orders-ms
+    ports:
+      - 3002:3002
+    volumes:
+      - ./orders-ms/src:/usr/src/app/src
+    command: yarn start:dev
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=postgresql://postgres:admin123@orders-db:5432/ordersDb?schema=public
+
+  orders-db:
+    image: postgres:14.0
+    container_name: order-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: ordersDb
+    volumes:
+      - ./orders-ms/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+#======================================================================
