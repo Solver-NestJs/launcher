@@ -7,3 +7,6 @@
 [submodule "products"]
 	path = products
 	url = https://github.com/Solver-NestJs/products-ms.git
+[submodule "payments"]
+	path = payments
+	url = https://github.com/Solver-NestJs/payments-ms.git

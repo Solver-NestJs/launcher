@@ -11,7 +11,13 @@
 
 1. Clonar el repositorio
 2. Crear el archivo .env basado en el archivo .env.template
-3. Para lanzar la aplicacion ejecute el siguiente comando
+3. ejecutar el siguiente comando para inicializar y actualizar los subModulos de Git
+
+```
+  git submodule update --init --recursive
+```
+
+4. Para lanzar la aplicacion ejecute el siguiente comando
 
 ```
 docker compose up --build
