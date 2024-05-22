@@ -69,16 +69,20 @@ services:
       - 5432:5432
 
   #======================================================================
-  # PRODUCTS MICROSERVICE
+  # PAYMENTS MICROSERVICE
   #======================================================================
   payments-ms:
-    build: ./payments-ms
+    build: ./payments
     ports:
-      - 3003:3003
+      - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
     volumes:
-      - ./payments-ms/src:/usr/src/app/src
+      - ./payments/src:/usr/src/app/src
     command: yarn start:dev
     environment:
       - NODE_ENV=development
-      - PORT=3003
+      - PORT=${PAYMENTS_MS_PORT}
       - NATS_SERVERS=nats://nats-server:4222
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - ENDPOINT_SECRET=${ENDPOINT_SECRET}
+      - SUCCESS_URL=${SUCCESS_URL}
+      - CANCEL_URL=${CANCEL_URL}
