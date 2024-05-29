@@ -8,6 +8,36 @@ services:
     image: nats:latest
     ports:
       - 8222:8222
+
+  #======================================================================
+  # AUTH MICROSERVICE
+  #======================================================================
+  auth-ms:
+    build: ./auth-ms
+    ports:
+      - 3004:3004
+    volumes:
+      - ./auth-ms/src:/usr/src/app/src
+    command: yarn start:dev
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=${AUTH_DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+
+  #======================================================================
+  sqlserver-db:
+    user: root
+    image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+    environment:
+      SA_PASSWORD: Admin12345**
+      ACCEPT_EULA: Y
+    ports:
+      - 1433:1433
+    volumes:
+      - ./data:/var/opt/sqlserver/data
+
   #======================================================================
   # CLIENT GATEWAY
   #======================================================================
@@ -25,64 +55,64 @@ services:
   #======================================================================
   # PRODUCTS MICROSERVICE
   #======================================================================
-  products-ms:
-    build: ./products
-    ports:
-      - 3001:3001
-    volumes:
-      - ./products/src:/usr/src/app/src
-    command: yarn start:dev
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - NATS_SERVERS=nats://nats-server:4222
-      - DATABASE_URL=file:./productDb.db
+  # products-ms:
+  #   build: ./products
+  #   ports:
+  #     - 3001:3001
+  #   volumes:
+  #     - ./products/src:/usr/src/app/src
+  #   command: yarn start:dev
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=3001
+  #     - NATS_SERVERS=nats://nats-server:4222
+  #     - DATABASE_URL=file:./productDb.db
   #======================================================================
   # ORDERS MICROSERVICE
   #======================================================================
-  orders-ms:
-    depends_on:
-      - orders-db
-    build: ./orders-ms
-    ports:
-      - 3002:3002
-    volumes:
-      - ./orders-ms/src:/usr/src/app/src
-    command: yarn start:dev
-    environment:
-      - NODE_ENV=development
-      - PORT=3002
-      - NATS_SERVERS=nats://nats-server:4222
-      - DATABASE_URL=postgresql://postgres:admin123@orders-db:5432/ordersDb?schema=public
+  # orders-ms:
+  #   depends_on:
+  #     - orders-db
+  #   build: ./orders-ms
+  #   ports:
+  #     - 3002:3002
+  #   volumes:
+  #     - ./orders-ms/src:/usr/src/app/src
+  #   command: yarn start:dev
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=3002
+  #     - NATS_SERVERS=nats://nats-server:4222
+  #     - DATABASE_URL=postgresql://postgres:admin123@orders-db:5432/ordersDb?schema=public
 
-  orders-db:
-    image: postgres:14.0
-    container_name: order-db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: ordersDb
-    volumes:
-      - ./orders-ms/postgres:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
+  # orders-db:
+  #   image: postgres:14.0
+  #   container_name: order-db
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: admin123
+  #     POSTGRES_DB: ordersDb
+  #   volumes:
+  #     - ./orders-ms/postgres:/var/lib/postgresql/data
+  #   ports:
+  #     - 5432:5432
 
   #======================================================================
   # PAYMENTS MICROSERVICE
   #======================================================================
-  payments-ms:
-    build: ./payments
-    ports:
-      - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
-    volumes:
-      - ./payments/src:/usr/src/app/src
-    command: yarn start:dev
-    environment:
-      - NODE_ENV=development
-      - PORT=${PAYMENTS_MS_PORT}
-      - NATS_SERVERS=nats://nats-server:4222
-      - STRIPE_SECRET=${STRIPE_SECRET}
-      - ENDPOINT_SECRET=${ENDPOINT_SECRET}
-      - SUCCESS_URL=${SUCCESS_URL}
-      - CANCEL_URL=${CANCEL_URL}
+  # payments-ms:
+  #   build: ./payments
+  #   ports:
+  #     - ${PAYMENTS_MS_PORT}:${PAYMENTS_MS_PORT}
+  #   volumes:
+  #     - ./payments/src:/usr/src/app/src
+  #   command: yarn start:dev
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=${PAYMENTS_MS_PORT}
+  #     - NATS_SERVERS=nats://nats-server:4222
+  #     - STRIPE_SECRET=${STRIPE_SECRET}
+  #     - ENDPOINT_SECRET=${ENDPOINT_SECRET}
+  #     - SUCCESS_URL=${SUCCESS_URL}
+  #     - CANCEL_URL=${CANCEL_URL}
