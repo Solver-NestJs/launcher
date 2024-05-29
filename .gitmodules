@@ -10,3 +10,6 @@
 [submodule "payments"]
 	path = payments
 	url = https://github.com/Solver-NestJs/payments-ms.git
+[submodule "auth-ms"]
+	path = auth-ms
+	url = https://github.com/Solver-NestJs/auth-ms.git
