@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  #======================================================================
+  # CLIENT GATEWAY
+  #======================================================================
+  client-gateway:
+    build:
+      context: ./client-gateway
+      dockerfile: dockerfile.prod
+    image: dockerwallas/nestjs-repository:0.0.1
+    ports:
+      - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
+    environment:
+      - NODE_ENV=production
+      - PORT=${CLIENT_GATEWAY_PORT}
+      - NATS_SERVERS=nats://nats-server:4222

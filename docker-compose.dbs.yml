@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  #======================================================================
+  # SQL Server
+  #======================================================================
+  auth-db:
+    user: root
+    image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+    container_name: auth-db
+    restart: always
+    environment:
+      SA_PASSWORD: Admin12345**
+      ACCEPT_EULA: Y
+    ports:
+      - 1433:1433
+    volumes:
+      - ./auth-ms/sqlserver:/var/opt/sqlserver/data
+    networks:
+      - curso-nestjs
+
+  #======================================================================
+  # POSTGRES Server
+  #======================================================================
+  orders-db:
+    image: postgres:14.0
+    container_name: order-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: ordersDb
+    volumes:
+      - ./orders-ms/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - curso-nestjs
+
+networks:
+  curso-nestjs:
+    name: curso-solver-nestjs
