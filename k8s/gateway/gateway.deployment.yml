@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+
+  template: #Plantilla de Pods
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: gateway-container
+          image: dockerwallas/nestjs-repository:latest
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-config
+                  key: PORT
+            - name: NATS_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-config
+                  key: NATS_SERVERS
